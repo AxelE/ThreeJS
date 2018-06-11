@@ -1,27 +1,50 @@
 // three.js
 import * as THREE from 'three';
 
+//Scene
 const scene = new THREE.Scene();
 
+//Camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth /window.innerHeight, 1, 10000);
+camera.rotation.set(0,0,0);
 const renderer = new THREE.WebGLRenderer();
 
+//FPS Vue
+let fpsObject = new THREE.Object3D();
+scene.add(fpsObject);
+
+//Pitch quand t'as un ptit creux
+let pitchObject = new THREE.Object3D();
+pitchObject.add(camera);
+
+//YARRR
+let yawObject = new THREE.Object3D();
+yawObject.position.y = 10;
+yawObject.add(pitchObject);
+fpsObject.add(yawObject);
+
 camera.position.z = 1000;
-var geometry = new THREE.BoxGeometry(200, 200, 200);
-var material = new THREE.MeshBasicMaterial({
+let geometry = new THREE.SphereGeometry(200, 200, 200);
+let material = new THREE.MeshBasicMaterial({
     color: 0xff0000,
     wireframe: true
-})
+});
 let mesh = new THREE.Mesh(geometry, material);
 
 scene.add(mesh);
 
-var parent = new THREE.Mesh(new THREE.BoxGeometry(200,200,200), new THREE.MeshBasicMaterial({color : 0xff0000}));
-var child = new THREE.Mesh(new THREE.BoxGeometry(200,200,200), new THREE.MeshBasicMaterial({color : 0x00ff00}));
-child.position.x = 300;
+
+let parent = new THREE.Mesh(new THREE.BoxGeometry(200,200,200), new THREE.MeshBasicMaterial({color : 0xff0000}));
+
+let child0 = new THREE.Mesh(new THREE.BoxGeometry(200,200,200), new THREE.MeshBasicMaterial({color : 0x00ff00}));
+
+
+child0.position.x = 200;
 
 scene.add(parent);
-parent.add(child);
+parent.add(child0);
+
+
 
 new THREE.Object3D();
 
@@ -41,11 +64,9 @@ let moveIteration= {
 }
 
 function update(){
-
     if(moveState.up) {
         mesh.rotation.x -= 0.01;
     }
-
     if(moveState.down) {
         mesh.rotation.x += 0.01;
     }
@@ -93,11 +114,13 @@ function disableMoveState(e){
 window.addEventListener('keydown', enableMoveState, false);
 window.addEventListener('keyup', disableMoveState, false);
 
-var mouse ;
+/* Cours 1
+
+let mouse ;
 
 function mouseTracker(e){
-    mesh.rotation.y += (e.movementX / 100);
-    mesh.rotation.x += (e.movementY / 100);
+    parent.rotation.y += (e.movementX / 100);
+    parent.rotation.x += (e.movementY / 100);
 }
 
 function enableMouseTracking(e){
@@ -110,6 +133,18 @@ function disableMouseTracking(e){
 window.addEventListener('mousedown', enableMouseTracking, false);
 window.addEventListener('mouseup', disableMouseTracking, false);
 
+*/
+
+//Cours 2
+document.addEventListener('mousemove', function (event) {
+    const movementX = event.movementX;
+    const movementY = event.movementY;
+
+    yawObject.rotation.y -= movementX * 0.002;
+    pitchObject.rotation.x -= movementY * 0.002;
+
+    pitchObject.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitchObject.rotation.x));
+}, false);
 
 function animate() {
     requestAnimationFrame( animate );
