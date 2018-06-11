@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 
 const scene = new THREE.Scene();
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth /window.innerHeight, 1, 10000);
 const renderer = new THREE.WebGLRenderer();
 
@@ -15,6 +16,14 @@ let mesh = new THREE.Mesh(geometry, material);
 
 scene.add(mesh);
 
+var parent = new THREE.Mesh(new THREE.BoxGeometry(200,200,200), new THREE.MeshBasicMaterial({color : 0xff0000}));
+var child = new THREE.Mesh(new THREE.BoxGeometry(200,200,200), new THREE.MeshBasicMaterial({color : 0x00ff00}));
+child.position.x = 300;
+
+scene.add(parent);
+parent.add(child);
+
+new THREE.Object3D();
 
 renderer.setSize(window.innerWidth,window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -108,6 +117,4 @@ function animate() {
     renderer.render( scene, camera );
 }
 animate();
-
-
 
