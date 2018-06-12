@@ -11,6 +11,7 @@ import 'three/examples/js/controls/PointerLockControls';
 
 var camera, scene, renderer, geometry, material, mesh;
 var controls;
+var sun = new THREE.Mesh;
 
 
 var keys = [];
@@ -30,6 +31,7 @@ function init() {
 
     // camera
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.z = 500;
 
     // cubes floor
     for (var x = 0; x < 30; x++) {
@@ -46,6 +48,26 @@ function init() {
             scene.add(mesh);
         }
     }
+
+    // add sunlight light
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(200, 0, 0);
+    directionalLight.name = "directional";
+    scene.add(directionalLight);
+
+    var geo = new THREE.SphereGeometry( 5, 32, 32 );
+    var mat = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+    sun = new THREE.Mesh( geo, mat );
+    sun.position.y = 200;
+    sun.position.x = 200;
+    scene.add( sun );
+
+    var geo = new THREE.SphereGeometry( 3, 12, 12 );
+    var mat = new THREE.MeshBasicMaterial( {color: 0x0000FF} );
+    var earth = new THREE.Mesh( geo, mat );
+    earth.position.y = 0;
+    earth.position.x = 20;
+    sun.add( earth );
 
     // renderer
     renderer = new THREE.WebGLRenderer();
@@ -104,6 +126,7 @@ function animate() {
         controls.getObject().translateX(delta * speed);
     }
 
+    sun.rotation.y += 0.008;
 
     renderer.render(scene, camera);
 }
