@@ -31,9 +31,9 @@ function init() {
 
     // camera
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.z = 500;
+    camera.position.z = 50;
 
-    // cubes floor
+    /* cubes floor
     for (var x = 0; x < 30; x++) {
         for (var y = 0; y < 30; y++) {
             var geometry = new THREE.BoxGeometry(2, 2, 2);
@@ -48,6 +48,28 @@ function init() {
             scene.add(mesh);
         }
     }
+    */
+
+    var geometry = new THREE.Geometry();
+
+    geometry.vertices.push(
+        new THREE.Vector3(-10, 10, 0),
+        new THREE.Vector3(-10, -10, 0),
+        new THREE.Vector3(10, -10, 0),
+        new THREE.Vector3(10, 10, 0),
+        new THREE.Vector3(0, 10, -10),
+        new THREE.Vector3(0, -10, -10),
+        new THREE.Vector3(0, -10, 10),
+        new THREE.Vector3(0, 10, 10),
+    );
+
+    //Carré
+    geometry.faces.push(new THREE.Face3(0, 1, 2), new THREE.Face3(0, 2, 3));
+
+    var material = new THREE.MeshBasicMaterial({color: 0xffff00});
+    var mesh = new THREE.Mesh(geometry, material);
+
+    scene.add(mesh);
 
     // add sunlight light
     var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
