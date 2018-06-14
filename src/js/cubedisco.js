@@ -3,7 +3,6 @@ import '../scss/index.scss';
 
 // three.js
 import * as THREE from 'three';
-import { TweenLite, Circ } from 'gsap';
 
 let camera, scene, renderer, geometry, material, mesh;
 let raycaster = new THREE.Raycaster();
@@ -30,10 +29,7 @@ function init() {
 }
 
 const clock = new THREE.Clock();
-let first = true;
-let myTween;
-let back=false;
-let objectSave;
+
 function animate() {
     requestAnimationFrame(animate);
 
@@ -44,55 +40,11 @@ function animate() {
 
     raycaster.setFromCamera( mouse, camera );
     var intersects = raycaster.intersectObjects( scene.children );
-
-
     for ( var i = 0; i < intersects.length; i++ ) {
         intersects[ i ].object.material.color.set( 0xff0000 );
-        if(first){
-            console.log(intersects[ i ].object);
-            first = false;
-            if(myTween) myTween.kill();
-            back=false;
-            objectSave = intersects[ i ].object;
-            myTween = TweenLite.to(
-                intersects[ i ].object.position,
-                2,
-                {
-                    x: 1000,
-                    ease: Circ.easeInOut,
-                    //delay:1
-                    onComplete: function(){
-                        console.log("My Tween complete");
-                    }
-                }
-            );
-        }
-
     }
 
-
-
     if(intersects.length <= 0) {
-
-        if(!back && objectSave){
-            if(myTween)myTween.kill();
-            console.log(objectSave);
-            myTween = TweenLite.to(
-                objectSave.position,
-                2,
-                {
-                    x: 0,
-                    ease: Circ.easeInOut,
-                    //delay:1
-                    onStart: function(){
-                        console.log("My Tween inverse started");
-                    }
-                }
-            );
-            back=true;
-            first=true;
-        }
-
         mesh.material.color.set(0x00ff00);
     }
 
