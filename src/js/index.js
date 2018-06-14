@@ -1,6 +1,4 @@
 
-//Récupération de la vue FPS fait par https://github.com/titoasty/boilerplate-threejs
-
 // styles
 import '../scss/index.scss';
 
@@ -9,9 +7,8 @@ import * as THREE from 'three';
 import 'three/examples/js/controls/PointerLockControls';
 
 
-var camera, scene, renderer, geometry, material, mesh;
+var camera, scene, renderer, geometry, material, mesh, terre, lune, pivotObject, pivotObject1;
 var controls;
-var sun = new THREE.Mesh;
 
 
 var keys = [];
@@ -25,15 +22,15 @@ document.onkeyup = function (e) {
     keys[e.keyCode] = false;
 };
 
-
 function init() {
+
+
     scene = new THREE.Scene();
 
     // camera
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.z = 50;
 
-    /* cubes floor
+    // cubes floor
     for (var x = 0; x < 30; x++) {
         for (var y = 0; y < 30; y++) {
             var geometry = new THREE.BoxGeometry(2, 2, 2);
@@ -48,48 +45,6 @@ function init() {
             scene.add(mesh);
         }
     }
-    */
-
-    var geometry = new THREE.Geometry();
-
-    geometry.vertices.push(
-        new THREE.Vector3(-10, 10, 0),
-        new THREE.Vector3(-10, -10, 0),
-        new THREE.Vector3(10, -10, 0),
-        new THREE.Vector3(10, 10, 0),
-        new THREE.Vector3(0, 10, -10),
-        new THREE.Vector3(0, -10, -10),
-        new THREE.Vector3(0, -10, 10),
-        new THREE.Vector3(0, 10, 10),
-    );
-
-    //Carré
-    geometry.faces.push(new THREE.Face3(0, 1, 2), new THREE.Face3(0, 2, 3));
-
-    var material = new THREE.MeshBasicMaterial({color: 0xffff00});
-    var mesh = new THREE.Mesh(geometry, material);
-
-    scene.add(mesh);
-
-    // add sunlight light
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(200, 0, 0);
-    directionalLight.name = "directional";
-    scene.add(directionalLight);
-
-    var geo = new THREE.SphereGeometry( 5, 32, 32 );
-    var mat = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-    sun = new THREE.Mesh( geo, mat );
-    sun.position.y = 200;
-    sun.position.x = 200;
-    scene.add( sun );
-
-    var geo = new THREE.SphereGeometry( 3, 12, 12 );
-    var mat = new THREE.MeshBasicMaterial( {color: 0x0000FF} );
-    var earth = new THREE.Mesh( geo, mat );
-    earth.position.y = 0;
-    earth.position.x = 20;
-    sun.add( earth );
 
     // renderer
     renderer = new THREE.WebGLRenderer();
@@ -121,9 +76,53 @@ function init() {
         element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
         element.requestPointerLock();
     }, false);
+
+    var geometry = new THREE.SphereGeometry( 20, 32, 32 );
+    var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+    var sphere = new THREE.Mesh( geometry, material );
+    sphere.position.x = -20;
+    sphere.position.y = 50;
+    sphere.position.z = -40;
+    scene.add( sphere );
+
+    var light = new THREE.PointLight( 0xffffff, 1, 3000 );
+
+
+    sphere.add( light );
+    scene.add(new THREE.AmbientLight(0x909090));
+
+    var geometry2 = new THREE.SphereGeometry( 8, 22, 22 );
+    var material2 = new THREE.MeshLambertMaterial( {color: 0x0000ff} );
+    terre = new THREE.Mesh( geometry2, material2 );
+    terre.position.x = 51;
+    scene.add( terre );
+
+    pivotObject = new THREE.Object3D();
+    sphere.add(pivotObject);
+    pivotObject.add( terre );
+
+    var geometry3 = new THREE.SphereGeometry( 4, 10, 10 );
+    var material3 = new THREE.MeshLambertMaterial( {color: 0xffffff} );
+    lune = new THREE.Mesh( geometry3, material3 );
+    lune.position.x = -27;
+    scene.add( lune );
+
+    pivotObject1 = new THREE.Object3D();
+    terre.add( pivotObject1 );
+    pivotObject1.add( lune );
 }
 
 var clock = new THREE.Clock();
+
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
+function onMouseMove ( event ) {
+
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = ( event.clientY / window.innerHeight ) * 2 + 1;
+
+}
 
 function animate() {
     requestAnimationFrame(animate);
@@ -148,9 +147,26 @@ function animate() {
         controls.getObject().translateX(delta * speed);
     }
 
-    sun.rotation.y += 0.008;
+
+    pivotObject.rotation.y += 0.01 * delta;
+    pivotObject1.rotation.y += 0.2*delta;
+
+
+
+
+    raycaster.setFromCamera( mouse, camera );
+
+    var intersects = raycaster.intersectObjects( scene.children );
+
+    for( var i = 0 ; i < intersects.length; i++ )
+        intersects[i].object.material.color.set( 0xff0000 );
+
+
+
 
     renderer.render(scene, camera);
+
+
 }
 
 init();
