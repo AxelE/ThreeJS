@@ -18,9 +18,20 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.z = 1000;
 
+
+    let myUniforms = {
+        color: {
+            value: new THREE.Color("yellow")
+        },
+        light: {
+            value: new THREE.Vector3(0.0, 1.0, 2.0)
+        }
+    }
+
     geometry = new THREE.SphereGeometry( 300, 32, 32 );
     material = new THREE.ShaderMaterial({
         transparent: true,
+        uniforms: myUniforms,
         vertexShader: vertex,
         fragmentShader: fragment
     });
