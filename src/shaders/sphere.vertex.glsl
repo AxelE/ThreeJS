@@ -1,4 +1,4 @@
-uniform float time;
+uniform vec3 color;
 uniform vec3 light;
 
 varying vec3 vNormal;
