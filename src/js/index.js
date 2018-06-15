@@ -20,6 +20,7 @@ function init() {
 
     geometry = new THREE.SphereGeometry( 300, 32, 32 );
     material = new THREE.ShaderMaterial({
+        transparent: true,
         vertexShader: vertex,
         fragmentShader: fragment
     });
