@@ -5,6 +5,9 @@ import '../scss/index.scss';
 import * as THREE from 'three';
 import { TweenLite, Circ } from 'gsap';
 
+import fragment from '../shaders/sphere.fragment.glsl';
+import vertex from '../shaders/sphere.vertex.glsl';
+
 let camera, scene, renderer, geometry, material, mesh;
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
@@ -15,9 +18,10 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.z = 1000;
 
-    geometry = new THREE.BoxGeometry(200, 200, 200);
-    material = new THREE.MeshBasicMaterial({
-        color: 0x00ff00
+    geometry = new THREE.SphereGeometry( 300, 32, 32 );
+    material = new THREE.ShaderMaterial({
+        vertexShader: vertex,
+        fragmentShader: fragment
     });
 
     mesh = new THREE.Mesh(geometry, material);
@@ -43,58 +47,6 @@ function animate() {
     mesh.rotation.y += 0.7 * delta;
 
     raycaster.setFromCamera( mouse, camera );
-    var intersects = raycaster.intersectObjects( scene.children );
-
-
-    for ( var i = 0; i < intersects.length; i++ ) {
-        intersects[ i ].object.material.color.set( 0xff0000 );
-        if(first){
-            console.log(intersects[ i ].object);
-            first = false;
-            if(myTween) myTween.kill();
-            back=false;
-            objectSave = intersects[ i ].object;
-            myTween = TweenLite.to(
-                intersects[ i ].object.position,
-                2,
-                {
-                    x: 1000,
-                    ease: Circ.easeInOut,
-                    //delay:1
-                    onComplete: function(){
-                        console.log("My Tween complete");
-                    }
-                }
-            );
-        }
-
-    }
-
-
-
-    if(intersects.length <= 0) {
-
-        if(!back && objectSave){
-            if(myTween)myTween.kill();
-            console.log(objectSave);
-            myTween = TweenLite.to(
-                objectSave.position,
-                2,
-                {
-                    x: 0,
-                    ease: Circ.easeInOut,
-                    //delay:1
-                    onStart: function(){
-                        console.log("My Tween inverse started");
-                    }
-                }
-            );
-            back=true;
-            first=true;
-        }
-
-        mesh.material.color.set(0x00ff00);
-    }
 
     renderer.render(scene, camera);
 }
